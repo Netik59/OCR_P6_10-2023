@@ -47,6 +47,7 @@ table {
 	border-spacing: 0;
 }
 /** end reset css**/
+
 body {
 	max-width: 1140px;
 	margin:auto;
@@ -84,18 +85,34 @@ h2{
 	font-size: 30px;
 	color: #1D6154
 }
-nav ul {
+
+h3{
+	font-family: 'Work Sans';
+	font-weight: 400;
+	font-size: 26px;
+	color: black
+}
+
+nav ul, nav a {
 	display: flex;
 	align-items: center;
 	list-style-type: none;
+	text-decoration: none;
 
 }
+
+nav a {
+	font-size: 16.8px;
+	color: black;
+}
+
 nav li {
 	padding: 0 10px;
 	font-size: 1.2em;
 }
 
-li:hover {
+li:hover, 
+nav a:hover  {
 	color: #B1663C;
 }
 #introduction {
@@ -248,6 +265,10 @@ h2 {
     box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
+#connect {
+	cursor: pointer;
+}
+
 #email, #motdepasse {
 	height: 51px;
 	width: 379px;
@@ -261,4 +282,95 @@ a {
 	font-size: 14px;
 	color: #3D3D3D;
 	text-decoration: underline;
+}
+.error_login {
+	margin-bottom: 15px;
+	background-color: #ffdddd;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 35px;
+}
+
+
+/************EDIT MODE*************/
+
+.edit_mode {
+	height: 59px;
+	background-color: black;
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+.edit_mode p {
+	color: white;
+}
+
+.display__flex {
+	display: flex;
+}
+
+.edit_mode .fa-pen-to-square {
+	padding-right: 12px;
+}
+
+.edit__link--modale {
+	display: none;
+	vertical-align: middle;
+	text-decoration: none;
+}
+
+
+.edit__link--modale .fa-pen-to-square {
+	padding-left: 25px;
+	padding-right: 10px;
+}
+
+.display__inline {
+	display: inline;
+}
+
+
+/*********** CSS de la modale *************/
+.modal {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	box-sizing: border-box;
+}
+
+.modal-wrapper {
+	position: absolute;
+	overflow: auto; /* Faire apparaître une scroll bar en cas de débordement */
+	width: 630px;
+	max-width: calc(100vw - 20px); /* Une fois la largeur de la taille l'écran moins 20 px pour le padding*/
+	max-height: calc(100vx - 20px); /* Une fois la hauteur de la taille l'écran moins 20 px pour le padding*/
+	padding: 30px;
+	background-color: white;
+	border-radius: 10px;
+}
+
+#title__modal {
+	text-align: center;
+}
+
+.js-modal-close {
+	position: relative;
+    top: 0px;
+    left: 610px;
+}
+
+.fa-xmark {
+	font-size: 24px;
+}
+
+.displayNone {
+	display: none;
 }

@@ -1,19 +1,9 @@
-//import { ajoutListenersAvis, ajoutListenerEnvoyerAvis, afficherAvis, afficherGraphiqueAvis, afficherGraphiqueCommentaire } from "./avis.js";
+//import { login } from "./login.js";
 
-//Récupération des projets eventuellement stockées dans le localStorage
-let works = window.localStorage.getItem('works');
 
-if (works === null) {
-    // Récupération des projets depuis l'API
-    const answer = await fetch('http://localhost:5678/api/works');
-    works = await answer.json();
-    // Transformation des projets en JSON
-    const valueWorks = JSON.stringify(works);
-    // Stockage des informations dans le localStorage
-    window.localStorage.setItem("works", valueWorks);
-} else {
-    works = JSON.parse(works);
-}
+const response = await fetch('http://localhost:5678/api/works');
+const works = await response.json();
+
 
 // Fonction pour générer les projets dynamiquement
 function generateWorks(works) {
@@ -41,6 +31,77 @@ function generateWorks(works) {
 
 generateWorks(works); // Générer les travaux
 
+
+/*************************************** Partie login *****************************************/
+
+let token = window.localStorage.getItem('token');
+
+let modal = null;
+const focusableSelector = "button, a, input, textarea";
+let focusables = [];
+
+// Fonction qui prend en paramètre l'événément pour ouvrir la modale
+const openModal = function (e) { 
+    e.preventDefault();
+    modal = document.querySelector(e.target.getAttribute("href")); // Trouver l'élément qui est cible par rapport au lien
+    focusables = Array.from(modal.querySelectorAll(focusableSelector));
+    modal.classList.remove("displayNone"); // Afficher la modale en enlevant la classe displayNone
+    modal.setAttribute("aria-hidden", false); // Désactiver l'attribut aria-hidden
+    modal.setAttribute("aria-modal", true);// Activer l'attribut aria-modal
+    modal.addEventListener("click", closeModal); // Permet de pouvoir quitter la modale en cliquant à l'extérieur de celle ci
+    modal.querySelector(".js-modal-close").addEventListener("click", closeModal); // Listener pour fermer la modale au clic de la croix
+    modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation); // Listener pour éviter que la modale se ferme lorsqu'on clique à l'intérieur de celle ci
+}
+
+// Fonction qui prend en paramètre l'événément pour fermer la modale
+const closeModal = function (e) {
+    if (modal === null) return // Si la modale est déjà nulle, s'arrêter ici
+    e.preventDefault();
+    modal.classList.add("displayNone"); 
+    modal.setAttribute("aria-hidden", true);
+    modal.setAttribute("aria-modal", false);
+    // Supprimer les listeners
+    modal.removeEventListener("click", closeModal); 
+    modal.querySelector(".js-modal-close").removeEventListener("click", closeModal); 
+    modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
+    modal = null; // Remettre la variable à null car la modale sera fermée donc nulle 
+}
+
+// Fonction pour éviter que la modale se ferme lorsqu'on clique à l'intérieur de celle ci
+const stopPropagation = function(e) {
+    e.stopPropagation();
+}
+
+const focusInModal = function (e) {
+    e.preventDefault();
+    let index = focusables.findIndex(f => f === modal.querySelector(`:focus`)); // Permet de trouver l'élément qui correspond à l'élément focus
+    index++;
+    if (index >= focusables.length) {
+        index = 0;
+    }
+    focusables[index].focus();
+}
+
+if (token) {
+    document.querySelector(".edit_mode").classList.add("display__flex");
+    document.querySelector(".edit__link--modale").classList.add("display__inline");
+
+    document.querySelectorAll(".js-modal").forEach(a => { // Pour chaque liens...
+        a.addEventListener("click", openModal); // ... Ajouter un EventListener et lorsqu'on va cliquer sur ces liens, appeler la fonction openModal
+
+    })
+    // Pour la fermeture de la modale lorsqu'on clique sur "ECHAP"
+    window.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" || e.key === "Esc") {
+            closeModal(e);
+        }
+        if (e.key === "Tab" && modal !== null) {
+            focusInModal(e);
+        }
+    })
+}
+
+/*************************************** Partie filtres *****************************************/
 
 // Enlève la classe .selected à tous les boutons de la classe .filters
 function unselectAllbuttons() {
@@ -81,11 +142,11 @@ btnFilterAll.addEventListener("click", function () {
 
 // Appel des fonctions de filtrages
 const btnFilterObjects = document.querySelector(".btnFilterObjects");
-filters(btnFilterObjects, 1)
+filters(btnFilterObjects, 1);
 
 const btnFilterApartments = document.querySelector(".btnFilterApartments");
-filters(btnFilterApartments, 2)
+filters(btnFilterApartments, 2);
 
 const btnFilterHotelRestau = document.querySelector(".btnFilterHotelRestau");
-filters(btnFilterHotelRestau, 3)
+filters(btnFilterHotelRestau, 3);
 
