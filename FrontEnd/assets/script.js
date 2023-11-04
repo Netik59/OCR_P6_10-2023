@@ -32,19 +32,20 @@ function generateWorks(works) {
 generateWorks(works); // Générer les travaux
 
 
-/*************************************** Partie login *****************************************/
+/********************************************************** Partie login *************************************************************/
 
-let token = window.localStorage.getItem('token');
 
+/****************************** Modal****************************/
 let modal = null;
 const focusableSelector = "button, a, input, textarea";
 let focusables = [];
 
 // Fonction qui prend en paramètre l'événément pour ouvrir la modale
-const openModal = function (e) { 
+const openModal = function (e) {
     e.preventDefault();
     modal = document.querySelector(e.target.getAttribute("href")); // Trouver l'élément qui est cible par rapport au lien
     focusables = Array.from(modal.querySelectorAll(focusableSelector));
+    focusables[0].focus(); // Par défaut mettre le premier élément en focus
     modal.classList.remove("displayNone"); // Afficher la modale en enlevant la classe displayNone
     modal.setAttribute("aria-hidden", false); // Désactiver l'attribut aria-hidden
     modal.setAttribute("aria-modal", true);// Activer l'attribut aria-modal
@@ -57,49 +58,164 @@ const openModal = function (e) {
 const closeModal = function (e) {
     if (modal === null) return // Si la modale est déjà nulle, s'arrêter ici
     e.preventDefault();
-    modal.classList.add("displayNone"); 
+    window.setTimeout(function () {
+        modal.classList.add("displayNone");  // Mettre le display:none uniquement après 0,5s (pour avoir le temps de gérer l'animation)
+        modal = null; // Remettre la variable à null car la modale sera fermée donc nulle 
+    }, 500)
     modal.setAttribute("aria-hidden", true);
     modal.setAttribute("aria-modal", false);
     // Supprimer les listeners
-    modal.removeEventListener("click", closeModal); 
-    modal.querySelector(".js-modal-close").removeEventListener("click", closeModal); 
+    modal.removeEventListener("click", closeModal);
+    modal.querySelector(".js-modal-close").removeEventListener("click", closeModal);
     modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
-    modal = null; // Remettre la variable à null car la modale sera fermée donc nulle 
 }
 
 // Fonction pour éviter que la modale se ferme lorsqu'on clique à l'intérieur de celle ci
-const stopPropagation = function(e) {
+const stopPropagation = function (e) {
     e.stopPropagation();
 }
 
+// Fonction pour l'accessibilité avec la navigation avec TAB et SHIFT + TAB
 const focusInModal = function (e) {
     e.preventDefault();
     let index = focusables.findIndex(f => f === modal.querySelector(`:focus`)); // Permet de trouver l'élément qui correspond à l'élément focus
-    index++;
+    if (e.shiftKey === true) {
+        index--;
+    } else {
+        index++;
+    }
     if (index >= focusables.length) {
         index = 0;
+    }
+    if (index < 0) {
+        index = focusables.length - 1;
     }
     focusables[index].focus();
 }
 
+document.querySelectorAll(".js-modal").forEach(a => { // Pour chaque liens...
+    a.addEventListener("click", openModal); // ... Ajouter un EventListener et lorsqu'on va cliquer sur ces liens, appeler la fonction openModal
+})
+
+// Pour la fermeture de la modale lorsqu'on clique sur "ECHAP"
+window.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" || e.key === "Esc") {
+        closeModal(e);
+    }
+    if (e.key === "Tab" && modal !== null) {
+        focusInModal(e);
+    }
+})
+
+
+/***************************Gestion modale add photo****************************/
+
+const btn__addPhoto = document.querySelector(".btn__add--photo")
+
+btn__addPhoto.addEventListener("click", function (e) {
+    const articleEditWorks = document.querySelector(".articles__edit--works");
+    const title__modal = document.getElementById("title__modal");
+    const jsModalBack = document.querySelector(".js-modal-back");
+    const form__addPhotos = document.querySelector(".form__addPhotos");
+    title__modal.textContent = "Ajout photo";
+    jsModalBack.classList.remove("displayNone");
+    form__addPhotos.classList.remove("displayNone");
+    articleEditWorks.innerHTML = "";
+});
+
+
+/*******************************************************************************/
+
+
+let token = window.localStorage.getItem('token');  // Récupération du token dans le localStorage
+let a__log = document.getElementById("a__log");
+
 if (token) {
-    document.querySelector(".edit_mode").classList.add("display__flex");
-    document.querySelector(".edit__link--modale").classList.add("display__inline");
+    document.querySelector(".edit_mode").classList.add("display__flex"); // Permet d'afficher la barre noire au dessus
+    document.querySelector(".edit__link--modale").classList.add("display__inline"); // Permet d'afficher le bouton modifier à côté de "Mes Projets"
 
-    document.querySelectorAll(".js-modal").forEach(a => { // Pour chaque liens...
-        a.addEventListener("click", openModal); // ... Ajouter un EventListener et lorsqu'on va cliquer sur ces liens, appeler la fonction openModal
+    // Changement du lien login en logout
+    a__log.removeAttribute("href");
+    a__log.textContent = "logout";
 
-    })
-    // Pour la fermeture de la modale lorsqu'on clique sur "ECHAP"
-    window.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" || e.key === "Esc") {
-            closeModal(e);
+    // Pour se déconnecter
+    a__log.addEventListener("click", function (e) {
+        // Empêchez le lien de suivre le lien href par défaut
+        e.preventDefault();
+        if (!a__log.hasAttribute("href")) {
+            localStorage.removeItem('token');
+            location.reload();
         }
-        if (e.key === "Tab" && modal !== null) {
-            focusInModal(e);
+    });
+
+
+    /************* Génération de l'intérieur de la modale **************/
+    function generateModalWorks(works) {
+        for (let i = 0; i < works.length; i++) {
+
+            const figure = works[i];
+            // Récupération de l'élément du DOM qui accueillera les fiches
+            const articleEditWorks = document.querySelector(".articles__edit--works");
+            // Création d’une balise dédiée à un seul projet
+            const workElement = document.createElement("figure");
+            workElement.dataset.id = works[i].id
+            // Création des balises 
+            const imageElement = document.createElement("img");
+            imageElement.src = figure.imageUrl;
+
+            const deleteButton = document.createElement("a");
+            deleteButton.classList.add("js-link__work--delete");
+
+            const iconElement = document.createElement("i");
+            iconElement.classList.add("fa-solid", "fa-trash-can");
+
+            // Ajoute l'élément <i> comme enfant de l'élément <a>
+            deleteButton.appendChild(iconElement);
+
+            // Mettre le même id de la balise figure à la balise a (pas besoin de faire un for)
+            deleteButton.id = figure.id;
+
+            // On rattache les fiches à la div
+            articleEditWorks.appendChild(workElement);
+            // Puis les élements aux fiches
+            workElement.appendChild(imageElement);
+            workElement.appendChild(deleteButton);
+
         }
+    }
+    generateModalWorks(works);
+
+    document.querySelectorAll(".js-link__work--delete").forEach((a, index) => { // Pour chaque liens...
+        a.addEventListener("click", async (e) => { // ... Ajouter un EventListener qui écoute le clic
+
+            // Trouver le lien qui a été cliqué en utilisant l'ID
+            const clickedLinkId = e.currentTarget.id;
+
+            console.log(`Le lien avec l'ID ${clickedLinkId} a été cliqué.`);
+
+            e.preventDefault();
+
+            const url = `http://localhost:5678/api/works/${clickedLinkId}`;
+            const figureToDelete = document.querySelector(`[data-id="${clickedLinkId}"]`); // Récupérer la figure qui correspond au même ID que le lien
+
+            const response = await fetch(url, {
+                method: `DELETE`,
+                headers: {
+                    Authorization: `Bearer ${token}`, // En-tête d'authentification
+                },
+            })
+
+            if (response.status === 200 || response.status === 204) { // Si le statut de la réponse est 200 ou 204 (réponse réussie sans contenu)
+                console.log("La suppression a réussi")
+                figureToDelete.remove(); // Supprimer le travail
+            } else {
+                console.log(token)
+                console.log(`Statut de réponse : ${response.status}`);
+            }
+        });
     })
 }
+
 
 /*************************************** Partie filtres *****************************************/
 

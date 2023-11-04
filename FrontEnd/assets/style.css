@@ -344,17 +344,46 @@ a {
 	height: 100%;
 	background: rgba(0, 0, 0, 0.8);
 	box-sizing: border-box;
+	animation: fadeIn 300ms both;
 }
 
 .modal-wrapper {
-	position: absolute;
 	overflow: auto; /* Faire apparaître une scroll bar en cas de débordement */
+	position: absolute;
 	width: 630px;
 	max-width: calc(100vw - 20px); /* Une fois la largeur de la taille l'écran moins 20 px pour le padding*/
-	max-height: calc(100vx - 20px); /* Une fois la hauteur de la taille l'écran moins 20 px pour le padding*/
-	padding: 30px;
+	max-height: calc(100vh - 20px); /* Une fois la hauteur de la taille l'écran moins 20 px pour le padding*/
+	padding: 40px;
 	background-color: white;
 	border-radius: 10px;
+	animation: slideFromTop 500ms both;
+	display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.articles__edit--works {
+	width: 76%;
+	padding-top: 50px;
+	padding-bottom: 40px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	border-bottom: 1px solid #B3B3B3;
+}
+
+.articles__edit--works img {
+	width: 87px;
+	height: 115px;
+
+}
+
+.modal[aria-hidden="true"] { /* Si la modal a cet attribut, jouer l'animation inverse sur la classe .modal car on doit la masquer */
+	animation: fadeOut 300ms both;
+}
+
+.modal[aria-hidden="true"] .modal-wrapper { /* Si la modal a cet attribut, jouer l'animation inverse sur la classe .modal-wrapper */
+	animation: slideToBottom 500ms both;
 }
 
 #title__modal {
@@ -364,11 +393,64 @@ a {
 .js-modal-close {
 	position: relative;
     top: 0px;
-    left: 610px;
+    left: 308px;
 }
 
-.fa-xmark {
+.js-modal-back {
+	position: relative;
+    bottom: 22px;
+    right: 308px;
+}
+
+.fa-xmark,
+.fa-arrow-left {
 	font-size: 24px;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes slideFromTop {
+	from { transform: translateY(-50px); }
+	to { transform: translateY(0px); }
+}
+
+@keyframes fadeOut {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
+
+@keyframes slideToBottom {
+	from { transform: translateY(0px); }
+	to { transform: translateY(50px); }
+}
+
+.js-link__work--delete {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	bottom: 110px;
+    left: 64px;
+	width: 17px;
+	height: 17px;
+	border-radius: 2px;
+	background-color: black;
+}
+
+.fa-trash-can {
+	color: white;
+	font-size: 10px;
+}
+
+.btn__add--photo {
+	margin-top: 40px;
+	width: 237px;
+	color: white;
+	background-color: #1D6154;
+	font-size: 14px;
 }
 
 .displayNone {
