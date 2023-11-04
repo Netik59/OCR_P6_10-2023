@@ -369,7 +369,6 @@ a {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
-	border-bottom: 1px solid #B3B3B3;
 }
 
 .articles__edit--works img {
@@ -445,6 +444,13 @@ a {
 	font-size: 10px;
 }
 
+.modal__button {
+	border-top: 1px solid #B3B3B3;
+	width: 76%;
+	display: flex;
+	justify-content: center;
+}
+
 .btn__add--photo {
 	margin-top: 40px;
 	width: 237px;
@@ -452,6 +458,84 @@ a {
 	background-color: #1D6154;
 	font-size: 14px;
 }
+
+.form__addPhotos {
+	width: 76%;
+	margin-top: -40px;
+	padding-bottom: 40px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	position: relative;
+}
+
+.send-image {
+	background-color: #E8F1F6;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 169px;
+}
+
+.fa-image {
+	padding-top: 20px;
+	font-size: 70px;
+	color: #B9C5CC;
+	padding-bottom: 8px;
+}
+
+#fileInput {
+	display: none;
+}
+
+label[for="fileInput"] {
+	background-color: #CBD6DC;
+	color: #306685;
+	height: 37px;
+	width: 173px;
+	border-radius: 50px;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
+
+#imagePreview {
+	font-size: 10px;
+	margin-top: 10px;
+}
+
+#titre, #categ {
+	height: 50px;
+	font-size: 1.2em;
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	width: 100%;
+}
+
+#categ {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+.fa-chevron-down {
+	font-size: 11px;
+    position: absolute;
+    bottom: 59px;
+    right: 28px;
+}
+
+#categ option:first-child {
+	display: none;
+  }
+
+label[for="categ"], label[for="titre"] {
+	margin-top: 20px;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
 
 .displayNone {
 	display: none;

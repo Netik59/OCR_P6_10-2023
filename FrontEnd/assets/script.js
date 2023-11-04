@@ -31,7 +31,6 @@ function generateWorks(works) {
 
 generateWorks(works); // Générer les travaux
 
-
 /********************************************************** Partie login *************************************************************/
 
 
@@ -111,16 +110,25 @@ window.addEventListener("keydown", function (e) {
 /***************************Gestion modale add photo****************************/
 
 const btn__addPhoto = document.querySelector(".btn__add--photo")
+const articleEditWorks = document.querySelector(".articles__edit--works");
+const title__modal = document.getElementById("title__modal");
+const jsModalBack = document.querySelector(".js-modal-back");
+const form__addPhotos = document.querySelector(".form__addPhotos");
 
 btn__addPhoto.addEventListener("click", function (e) {
-    const articleEditWorks = document.querySelector(".articles__edit--works");
-    const title__modal = document.getElementById("title__modal");
-    const jsModalBack = document.querySelector(".js-modal-back");
-    const form__addPhotos = document.querySelector(".form__addPhotos");
     title__modal.textContent = "Ajout photo";
     jsModalBack.classList.remove("displayNone");
     form__addPhotos.classList.remove("displayNone");
     articleEditWorks.innerHTML = "";
+    btn__addPhoto.textContent = "Valider";
+});
+
+jsModalBack.addEventListener("click", function (e) {
+    title__modal.textContent = "Galerie photo";
+    jsModalBack.classList.add("displayNone");
+    form__addPhotos.classList.add("displayNone");
+    btn__addPhoto.textContent = "Ajouter une photo";
+    // réafficher travaux ici
 });
 
 

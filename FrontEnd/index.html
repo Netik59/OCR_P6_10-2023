@@ -62,26 +62,42 @@
       </h2>
 
       <!-------------------------------------- Création de la modale remove photos ------------------------------------>
-      <aside id="modal1" class="modal displayNone" aria-hidden="true" role="dialog" aria-labelledby="title__modal">
+      <aside id="modal1" class="modal displayNone" aria-hidden="true" aria-labelledby="title__modal">
         <div class="modal-wrapper js-modal-stop">
           <a id="xmark__close--1" class="js-modal-close"><i class="fa-solid fa-xmark"></i></a>
           <a class="js-modal-back displayNone"><i class="fa-solid fa-arrow-left"></i></a>
           <h3 id="title__modal">Galerie photo</h3>
           <article class="articles__edit--works">
             <!-- Code ajouté -->
-            <form class="form__addPhotos displayNone" method="POST" enctype="multipart/form-data">
+          </article>
+          <form class="form__addPhotos displayNone" method="POST" enctype="multipart/form-data">
+            <div class="send-image">
+              <i class="fa-regular fa-image"></i>
               <input type="file" name="image" accept="image/*" id="fileInput">
+              <label for="fileInput">+ Ajouter photo</label>
 
               <!-- Zone de prévisualisation de l'image -->
               <div id="imagePreview">
-                + Ajouter photo
+                jpg, png : 4mo max
               </div>
+            </div>
 
-              <!-- Bouton pour activer le champ de fichier -->
-              <button type="button">+ Ajouter photo</button>
-            </form>
-          </article>
-          <button class="btn__add--photo">Ajouter une photo</button>
+            <label for="titre">Titre</label>
+            <input type="text" id="titre" name="titre" required>
+
+            <label for="categ">Catégorie</label>
+            <i class="fa-solid fa-chevron-down"></i>
+            <select id="categ" name="categ" required>
+              <option value=""></option>
+              <option value="reponse1">Réponse 1</option>
+              <option value="reponse2">Réponse 2</option>
+              <option value="reponse3">Réponse 3</option>
+            </select>
+
+          </form>
+          <div class="modal__button">
+            <button class="btn__add--photo">Ajouter une photo</button>
+          </div>
         </div>
       </aside>
       <!-------------------------------------------------------------------------------------------------->
