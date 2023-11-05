@@ -1,21 +1,19 @@
-//import { login } from "./login.js";
 
+//import { login } from "./login.js";
 
 const response = await fetch('http://localhost:5678/api/works');
 const works = await response.json();
 
-
 // Fonction pour générer les projets dynamiquement
 function generateWorks(works) {
     for (let i = 0; i < works.length; i++) {
-
         const figure = works[i];
         // Récupération de l'élément du DOM qui accueillera les fiches
         const divGallery = document.querySelector(".gallery");
         // Création d’une balise dédiée à un seul projet
         const workElement = document.createElement("figure");
         workElement.dataset.id = works[i].id
-        // Création des balises 
+        // Création des balises
         const imageElement = document.createElement("img");
         imageElement.src = figure.imageUrl;
         const nameElement = document.createElement("figcaption");
@@ -25,20 +23,15 @@ function generateWorks(works) {
         // Puis les élements aux fiches
         workElement.appendChild(imageElement);
         workElement.appendChild(nameElement);
-
     }
 }
-
 generateWorks(works); // Générer les travaux
-
 /********************************************************** Partie login *************************************************************/
-
 
 /****************************** Modal****************************/
 let modal = null;
 const focusableSelector = "button, a, input, textarea";
 let focusables = [];
-
 // Fonction qui prend en paramètre l'événément pour ouvrir la modale
 const openModal = function (e) {
     e.preventDefault();
@@ -52,14 +45,13 @@ const openModal = function (e) {
     modal.querySelector(".js-modal-close").addEventListener("click", closeModal); // Listener pour fermer la modale au clic de la croix
     modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation); // Listener pour éviter que la modale se ferme lorsqu'on clique à l'intérieur de celle ci
 }
-
 // Fonction qui prend en paramètre l'événément pour fermer la modale
 const closeModal = function (e) {
     if (modal === null) return // Si la modale est déjà nulle, s'arrêter ici
     e.preventDefault();
     window.setTimeout(function () {
         modal.classList.add("displayNone");  // Mettre le display:none uniquement après 0,5s (pour avoir le temps de gérer l'animation)
-        modal = null; // Remettre la variable à null car la modale sera fermée donc nulle 
+        modal = null; // Remettre la variable à null car la modale sera fermée donc nulle
     }, 500)
     modal.setAttribute("aria-hidden", true);
     modal.setAttribute("aria-modal", false);
@@ -68,12 +60,10 @@ const closeModal = function (e) {
     modal.querySelector(".js-modal-close").removeEventListener("click", closeModal);
     modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
 }
-
 // Fonction pour éviter que la modale se ferme lorsqu'on clique à l'intérieur de celle ci
 const stopPropagation = function (e) {
     e.stopPropagation();
 }
-
 // Fonction pour l'accessibilité avec la navigation avec TAB et SHIFT + TAB
 const focusInModal = function (e) {
     e.preventDefault();
@@ -91,11 +81,9 @@ const focusInModal = function (e) {
     }
     focusables[index].focus();
 }
-
 document.querySelectorAll(".js-modal").forEach(a => { // Pour chaque liens...
     a.addEventListener("click", openModal); // ... Ajouter un EventListener et lorsqu'on va cliquer sur ces liens, appeler la fonction openModal
 })
-
 // Pour la fermeture de la modale lorsqu'on clique sur "ECHAP"
 window.addEventListener("keydown", function (e) {
     if (e.key === "Escape" || e.key === "Esc") {
@@ -106,22 +94,109 @@ window.addEventListener("keydown", function (e) {
     }
 })
 
+/*********************Récupération du token dans le localStorage*********************/
+let token = window.localStorage.getItem('token');
+
+/************************************************************************************/
 
 /***************************Gestion modale add photo****************************/
-
 const btn__addPhoto = document.querySelector(".btn__add--photo")
 const articleEditWorks = document.querySelector(".articles__edit--works");
 const title__modal = document.getElementById("title__modal");
 const jsModalBack = document.querySelector(".js-modal-back");
 const form__addPhotos = document.querySelector(".form__addPhotos");
-
+const titreInput = document.getElementById("titre");
+const categSelect = document.getElementById("categ");
 btn__addPhoto.addEventListener("click", function (e) {
     title__modal.textContent = "Ajout photo";
     jsModalBack.classList.remove("displayNone");
     form__addPhotos.classList.remove("displayNone");
     articleEditWorks.innerHTML = "";
     btn__addPhoto.textContent = "Valider";
+    if (btn__addPhoto.textContent === "Valider") {
+        // Écoutez l'événement "input" sur les champs du formulaire
+        titreInput.addEventListener("input", checkFields); // Écoute les changements dans le champ titre
+        categSelect.addEventListener("input", checkFields); // Écoute les changements dans le sélecteur de catégorie
+        inputImage.addEventListener("input", checkFields); // Écoute les changements dans le champ d'image
+        // Fonction pour vérifier les champs et mettre à jour le bouton
+        function checkFields() {
+            if (titreInput.value.trim() === "" || categSelect.value === "" || !inputImage.files[0]) {
+                // L'un des champs n'est pas rempli, donc le bouton est en gris
+                btn__addPhoto.style.backgroundColor = "#A7A7A7";
+                btn__addPhoto.style.border = "1px solid #A7A7A7";
+            } else {
+                // Tous les champs sont remplis, donc le bouton est en vert
+                btn__addPhoto.style.backgroundColor = "#1D6154";
+                btn__addPhoto.style.border = "1px solid #1D6154";
+            }
+        }
+        // Appelez la fonction initiale pour vérifier l'état initial
+        checkFields();
+
+        btn__addPhoto.addEventListener("click", async function (e) {
+            if (titreInput.value.trim() === "" || categSelect.value === "" || !inputImage.files[0]) {
+                document.querySelector(".error_login").classList.remove("displayNone");
+            } else {
+                e.preventDefault();
+                const url = `http://localhost:5678/api/works`;
+
+                const formData = new FormData(); // Créer un objet FormData
+
+                formData.append('image', inputImage.files[0], inputImage.files[0].name); // Ajouter l'image au formulaire
+                formData.append('title', titreInput.value); // Ajouter le titre au formulaire
+                formData.append('categoryId', parseInt(categSelect.value)); // Ajouter la catégorie au formulaire
+
+                // const selectedFile = inputImage.files[0];
+                // const imagePath = URL.createObjectURL(selectedFile);
+                // const data = {
+                //     title: titreInput.value,
+                //     imageUrl: imagePath,
+                //     categoryId: categSelect.value
+                // };
+
+                const response = await fetch(url, {
+                    method: `POST`,
+                    headers: {
+                        "Authorization": `Bearer ${token}`, // En-tête d'authentification
+                    },
+                    body: formData,
+                })
+
+                console.log(formData)
+                if (response.status === 201 || response.status === 204) {
+                    console.log("Ajout réussi")
+                    location.reload();
+                } else {
+                    console.log(token)
+                    console.log(`Statut de réponse : ${response.status}`);
+                }
+            }
+        });
+    }
 });
+const inputImage = document.getElementById("fileInput");
+const imagePreview = document.getElementById("imagePreview");
+// Écouter les modifications de l'input
+inputImage.addEventListener("change", function () {
+    const selectedImage = inputImage.files[0];
+    if (selectedImage) {
+        const objectURL = URL.createObjectURL(selectedImage);
+        // Mettre à jour la source de l'image pour afficher la prévisualisation
+        imagePreview.src = objectURL;
+        imagePreview.classList.remove("displayNone")
+        const iconElement = document.querySelector(".fa-regular.fa-image");
+        const labelElement = document.querySelector("label[for=fileInput]");
+        const formats_p = document.getElementById("formats");
+        iconElement.style.display = "none";
+        inputImage.style.display = "none";
+        labelElement.style.display = "none";
+        formats_p.style.display = "none";
+    } else {
+        // Réinitialiser l'image si aucun fichier n'est sélectionné
+        imagePreview.src = "";
+    }
+});
+
 
 jsModalBack.addEventListener("click", function (e) {
     title__modal.textContent = "Galerie photo";
@@ -131,21 +206,14 @@ jsModalBack.addEventListener("click", function (e) {
     // réafficher travaux ici
 });
 
-
 /*******************************************************************************/
-
-
-let token = window.localStorage.getItem('token');  // Récupération du token dans le localStorage
 let a__log = document.getElementById("a__log");
-
 if (token) {
     document.querySelector(".edit_mode").classList.add("display__flex"); // Permet d'afficher la barre noire au dessus
     document.querySelector(".edit__link--modale").classList.add("display__inline"); // Permet d'afficher le bouton modifier à côté de "Mes Projets"
-
     // Changement du lien login en logout
     a__log.removeAttribute("href");
     a__log.textContent = "logout";
-
     // Pour se déconnecter
     a__log.addEventListener("click", function (e) {
         // Empêchez le lien de suivre le lien href par défaut
@@ -156,63 +224,49 @@ if (token) {
         }
     });
 
-
     /************* Génération de l'intérieur de la modale **************/
     function generateModalWorks(works) {
         for (let i = 0; i < works.length; i++) {
-
             const figure = works[i];
             // Récupération de l'élément du DOM qui accueillera les fiches
             const articleEditWorks = document.querySelector(".articles__edit--works");
             // Création d’une balise dédiée à un seul projet
             const workElement = document.createElement("figure");
             workElement.dataset.id = works[i].id
-            // Création des balises 
+            // Création des balises
             const imageElement = document.createElement("img");
             imageElement.src = figure.imageUrl;
-
             const deleteButton = document.createElement("a");
             deleteButton.classList.add("js-link__work--delete");
-
             const iconElement = document.createElement("i");
             iconElement.classList.add("fa-solid", "fa-trash-can");
-
             // Ajoute l'élément <i> comme enfant de l'élément <a>
             deleteButton.appendChild(iconElement);
-
             // Mettre le même id de la balise figure à la balise a (pas besoin de faire un for)
             deleteButton.id = figure.id;
-
             // On rattache les fiches à la div
             articleEditWorks.appendChild(workElement);
             // Puis les élements aux fiches
             workElement.appendChild(imageElement);
             workElement.appendChild(deleteButton);
-
         }
     }
     generateModalWorks(works);
-
-    document.querySelectorAll(".js-link__work--delete").forEach((a, index) => { // Pour chaque liens...
-        a.addEventListener("click", async (e) => { // ... Ajouter un EventListener qui écoute le clic
-
+    document.querySelectorAll(".js-link__work--delete").forEach((a) => { // Pour chaque liens...
+        a.addEventListener("click", async (event) => { // ... Ajouter un EventListener qui écoute le clic
+            event.preventDefault();
             // Trouver le lien qui a été cliqué en utilisant l'ID
-            const clickedLinkId = e.currentTarget.id;
-
+            const clickedLinkId = event.currentTarget.id;
             console.log(`Le lien avec l'ID ${clickedLinkId} a été cliqué.`);
-
-            e.preventDefault();
-
             const url = `http://localhost:5678/api/works/${clickedLinkId}`;
+            console.log(url);
             const figureToDelete = document.querySelector(`[data-id="${clickedLinkId}"]`); // Récupérer la figure qui correspond au même ID que le lien
-
             const response = await fetch(url, {
                 method: `DELETE`,
                 headers: {
                     Authorization: `Bearer ${token}`, // En-tête d'authentification
                 },
             })
-
             if (response.status === 200 || response.status === 204) { // Si le statut de la réponse est 200 ou 204 (réponse réussie sans contenu)
                 console.log("La suppression a réussi")
                 figureToDelete.remove(); // Supprimer le travail
@@ -224,21 +278,17 @@ if (token) {
     })
 }
 
-
 /*************************************** Partie filtres *****************************************/
-
 // Enlève la classe .selected à tous les boutons de la classe .filters
 function unselectAllbuttons() {
     const buttons = document.querySelectorAll(".filters button")
     Array.from(buttons).forEach((button) => { // Converti la liste en tableau et parcours tous les éléments du tableau
-        button.classList.remove("selected") // Pour chaque élément, leur enlever la classe .dot_selected 
+        button.classList.remove("selected") // Pour chaque élément, leur enlever la classe .dot_selected
     })
 }
 
-
 let isAllDisplayed = false; // Variable pour suivre l'état actuel du bouton "Tout afficher"
-
-// Fonction pour générer les filtres 
+// Fonction pour générer les filtres
 function filters(btnFilter, Id) {
     btnFilter.addEventListener("click", function () {
         const worksFiltered = works.filter(function (work) { // Appel de la fonction filtrage sur chaque élément du tableau works
@@ -251,7 +301,6 @@ function filters(btnFilter, Id) {
         isAllDisplayed = false; // Variable pour suivre l'état actuel du bouton "Tout afficher"
     });
 }
-
 // Code pour le bouton "Tous" affichant tous les travaux
 const btnFilterAll = document.querySelector(".btnFilterAll");
 btnFilterAll.addEventListener("click", function () {
@@ -263,14 +312,11 @@ btnFilterAll.addEventListener("click", function () {
         isAllDisplayed = true; // Met à jour l'état du bouton "Tout afficher"
     }
 });
-
 // Appel des fonctions de filtrages
 const btnFilterObjects = document.querySelector(".btnFilterObjects");
 filters(btnFilterObjects, 1);
-
 const btnFilterApartments = document.querySelector(".btnFilterApartments");
 filters(btnFilterApartments, 2);
-
 const btnFilterHotelRestau = document.querySelector(".btnFilterHotelRestau");
 filters(btnFilterHotelRestau, 3);
 

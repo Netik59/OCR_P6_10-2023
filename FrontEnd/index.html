@@ -71,15 +71,16 @@
             <!-- Code ajouté -->
           </article>
           <form class="form__addPhotos displayNone" method="POST" enctype="multipart/form-data">
+            <div class="error_login displayNone">
+              <p>Veuillez remplir tous les champs</p>
+            </div>
             <div class="send-image">
+              <img id="imagePreview" src="" alt="Image Preview" class="displayNone">
               <i class="fa-regular fa-image"></i>
               <input type="file" name="image" accept="image/*" id="fileInput">
               <label for="fileInput">+ Ajouter photo</label>
 
-              <!-- Zone de prévisualisation de l'image -->
-              <div id="imagePreview">
-                jpg, png : 4mo max
-              </div>
+              <p id="formats">jpg, png : 4mo max</p>
             </div>
 
             <label for="titre">Titre</label>
@@ -88,10 +89,11 @@
             <label for="categ">Catégorie</label>
             <i class="fa-solid fa-chevron-down"></i>
             <select id="categ" name="categ" required>
-              <option value=""></option>
-              <option value="reponse1">Réponse 1</option>
-              <option value="reponse2">Réponse 2</option>
-              <option value="reponse3">Réponse 3</option>
+              <option value="default"></option>
+              <option value="1">Objets</option>
+              <option value="2">Appartements 2</option>
+              <option value="3">Hotels & restaurants</option>
+              <option value="4">Bar & Restaurant</option>
             </select>
 
           </form>

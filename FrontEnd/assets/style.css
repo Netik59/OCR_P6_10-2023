@@ -372,7 +372,7 @@ a {
 }
 
 .articles__edit--works img {
-	width: 87px;
+	width: 85px;
 	height: 115px;
 
 }
@@ -501,7 +501,7 @@ label[for="fileInput"] {
 	align-items: center;
   }
 
-#imagePreview {
+#formats{
 	font-size: 10px;
 	margin-top: 10px;
 }
@@ -526,6 +526,10 @@ label[for="fileInput"] {
     right: 28px;
 }
 
+#categ option[label="Sélectionnez une catégorie"] {
+    display: none;
+}
+
 #categ option:first-child {
 	display: none;
   }
@@ -536,6 +540,10 @@ label[for="categ"], label[for="titre"] {
 	text-align: left;
 }
 
+#imagePreview {
+	height: 100%;
+	width: 27%;
+}
 
 .displayNone {
 	display: none;
