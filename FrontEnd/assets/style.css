@@ -63,6 +63,10 @@ section {
 	margin: 50px 0
 }
 
+img {
+	object-fit: cover;
+}
+
 h1{
 	display: flex;
 	flex-direction: column;
@@ -451,7 +455,7 @@ a {
 	justify-content: center;
 }
 
-.btn__add--photo {
+.btn__add--photo, .btn__validate--photo {
 	margin-top: 40px;
 	width: 237px;
 	color: white;
@@ -459,9 +463,15 @@ a {
 	font-size: 14px;
 }
 
+.btn__validate--photo {
+	background-color: #A7A7A7;
+	border: 1px solid #A7A7A7;
+	display: none;
+}
+
 .form__addPhotos {
 	width: 76%;
-	margin-top: -40px;
+	margin-top: 40px;
 	padding-bottom: 40px;
 	display: flex;
 	flex-direction: column;
