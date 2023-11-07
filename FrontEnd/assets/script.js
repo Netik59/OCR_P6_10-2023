@@ -1,6 +1,24 @@
 
 //import { login } from "./login.js";
 
+
+// Appel des éléments nécessaires
+const btn__addPhoto = document.querySelector(".btn__add--photo");
+const btn__ValidatePhoto = document.querySelector(".btn__validate--photo");
+const articleEditWorks = document.querySelector(".articles__edit--works");
+const title__modal = document.getElementById("title__modal");
+const jsModalBack = document.querySelector(".js-modal-back");
+const form__addPhotos = document.querySelector(".form__addPhotos");
+const titreInput = document.getElementById("titre");
+const categSelect = document.getElementById("categ");
+const inputImage = document.getElementById("fileInput");
+const imagePreview = document.getElementById("imagePreview");
+const iconElement = document.querySelector(".fa-regular.fa-image");
+const labelElement = document.querySelector("label[for=fileInput]");
+const formats_p = document.getElementById("formats");
+const divGallery = document.querySelector(".gallery");
+
+
 const response = await fetch('http://localhost:5678/api/works');
 const works = await response.json();
 
@@ -8,8 +26,6 @@ const works = await response.json();
 function generateWorks(works) {
     for (let i = 0; i < works.length; i++) {
         const figure = works[i];
-        // Récupération de l'élément du DOM qui accueillera les fiches
-        const divGallery = document.querySelector(".gallery");
         // Création d’une balise dédiée à un seul projet
         const workElement = document.createElement("figure");
         workElement.dataset.id = works[i].id
@@ -108,18 +124,6 @@ let token = window.localStorage.getItem('token');
 
 
 /***************************Gestion modale add photo****************************/
-// Appel des éléments nécessaires
-const btn__addPhoto = document.querySelector(".btn__add--photo");
-const btn__ValidatePhoto = document.querySelector(".btn__validate--photo");
-const articleEditWorks = document.querySelector(".articles__edit--works");
-const title__modal = document.getElementById("title__modal");
-const jsModalBack = document.querySelector(".js-modal-back");
-const form__addPhotos = document.querySelector(".form__addPhotos");
-const titreInput = document.getElementById("titre");
-const categSelect = document.getElementById("categ");
-const inputImage = document.getElementById("fileInput");
-const imagePreview = document.getElementById("imagePreview");
-
 
 /*********** Lors du clic sur le bouton ajouter une photo *************/
 btn__addPhoto.addEventListener("click", function (e) {
@@ -147,6 +151,9 @@ btn__addPhoto.addEventListener("click", function (e) {
             // Tous les champs sont remplis, donc le bouton est en vert
             btn__ValidatePhoto.style.backgroundColor = "#1D6154";
             btn__ValidatePhoto.style.border = "1px solid #1D6154";
+            window.setTimeout(function () {
+                document.querySelector(".error_login").classList.add("displayNone");
+            }, 500)
         }
 
     }
@@ -164,9 +171,6 @@ inputImage.addEventListener("change", function () {
         imagePreview.src = objectURL;
         imagePreview.classList.remove("displayNone") // Afficher la prévisualisation
         // Effacer ces éléments pour laisser place à la prévisualisation
-        const iconElement = document.querySelector(".fa-regular.fa-image");
-        const labelElement = document.querySelector("label[for=fileInput]");
-        const formats_p = document.getElementById("formats");
         iconElement.style.display = "none";
         inputImage.style.display = "none";
         labelElement.style.display = "none";
@@ -178,12 +182,10 @@ inputImage.addEventListener("change", function () {
 });
 
 
-/************* Génération de l'intérieur de la modale n°1**************/
+/************* Génération de l'intérieur de la modale n°1 **************/
 function generateModalWorks(works) {
     for (let i = 0; i < works.length; i++) {
         const figure = works[i];
-        // Récupération de l'élément du DOM qui accueillera les fiches
-        const articleEditWorks = document.querySelector(".articles__edit--works");
         // Création d’une balise dédiée à un seul projet
         const workElement = document.createElement("figure");
         workElement.dataset.id = works[i].id
@@ -233,6 +235,18 @@ if (token) {
 
 }
 
+// Reset le formulaire
+function resetForm() {
+    const icone = document.querySelector(".fa-regular.fa-image");
+    icone.style.display = "block";
+    imagePreview.classList.add("displayNone")
+    labelElement.style.display = "flex";
+    formats_p.style.display = "block";
+    inputImage.value = null;
+    categSelect.value = null;
+    titreInput.value = null;
+    document.querySelector(".error_login").classList.add("displayNone");
+}
 
 // Lors du clic sur l'icone flêche pour retourner en arrière...
 jsModalBack.addEventListener("click", function (e) {
@@ -243,6 +257,7 @@ jsModalBack.addEventListener("click", function (e) {
     btn__addPhoto.textContent = "Ajouter une photo";
     btn__ValidatePhoto.style.display = "none";
     btn__addPhoto.style.display = "block";
+    resetForm()
 
     // Réafficher travaux
     articleEditWorks.style.display = 'flex';
@@ -274,49 +289,17 @@ btn__ValidatePhoto.addEventListener("click", async function (e) {
         })
 
         if (response.status === 201 || response.status === 204) {
-            /********* Ajout pour la gallerie *********/ 
-            // Récupération de l'élément du DOM qui accueillera les fiches
-            const divGallery = document.querySelector(".gallery");
-            // Création d’une balise dédiée à un seul projet
-            const workElement = document.createElement("figure");
-            // Création des balises
-            const imageElement = document.createElement("img");
-            imageElement.src = `./assets/images/${inputImage.files[0].name}`;
-            const nameElement = document.createElement("figcaption");
-            nameElement.innerText = titreInput.value;
-            // On rattache les fiches à la div
-            divGallery.appendChild(workElement);
-            // Puis les élements aux fiches
-            workElement.appendChild(imageElement);
-            workElement.appendChild(nameElement);
 
-            
-            /********* Ajout pour la modale *********/ 
-            // Récupération de l'élément du DOM qui accueillera les fiches
-            const articleEditWorks = document.querySelector(".articles__edit--works");
-            // Création d’une balise dédiée à un seul projet
-            const workEditElement = document.createElement("figure");
-            // Création des balises
-            const imageEditElement = document.createElement("img");
-            imageEditElement.src = `./assets/images/${inputImage.files[0].name}`;
-            const deleteButton = document.createElement("a");
-            deleteButton.classList.add("js-link__work--delete");
-            const iconElement = document.createElement("i");
-            iconElement.classList.add("fa-solid", "fa-trash-can");
-            // Ajoute l'élément <i> comme enfant de l'élément <a>
-            deleteButton.appendChild(iconElement);
-            // On rattache les fiches à la div
-            articleEditWorks.appendChild(workEditElement);
-            // Puis les élements aux fiches
-            workEditElement.appendChild(imageEditElement);
-            workEditElement.appendChild(deleteButton);
+            divGallery.innerHTML = "";
+            articleEditWorks.innerHTML = "";
+            const response = await fetch("http://localhost:5678/api/works");
+            const worksData = await response.json();
+            generateWorks(worksData);
+            generateModalWorks(worksData);
 
-            let allFigures = document.querySelectorAll(".articles__edit--works figure")
-            let lastFigure = allFigures[allFigures.length - 2]
-            let lastFigureId = lastFigure.getAttribute("data-id");
-            let lastFigureIdInt = parseInt(lastFigureId);
-            workEditElement.setAttribute("data-id", lastFigureIdInt + 1);
-            deleteButton.id = lastFigureIdInt + 1;
+            removeWork()
+
+            resetForm()
 
         } else {
             console.log(token)
@@ -328,33 +311,37 @@ btn__ValidatePhoto.addEventListener("click", async function (e) {
 
 
 /*************************** Suppression d'un projet *******************************/
-document.querySelectorAll(".js-link__work--delete").forEach((a) => { // Pour chaque liens...
-    a.addEventListener("click", async (event) => { // ... Ajouter un EventListener qui écoute le clic
-        event.preventDefault();
-        // Trouver le lien qui a été cliqué en utilisant l'ID
-        const clickedLinkId = event.currentTarget.id;
-        console.log(`Le lien avec l'ID ${clickedLinkId} a été cliqué.`);
-        const url = `http://localhost:5678/api/works/${clickedLinkId}`;
-        console.log(url);
-        const figureToDelete = document.querySelectorAll(`[data-id="${clickedLinkId}"]`); // Récupérer la figure qui correspond au même ID que le lien
-        const response = await fetch(url, {
-            method: `DELETE`,
-            headers: {
-                Authorization: `Bearer ${token}`, // En-tête d'authentification
-            },
-        })
-        if (response.status === 200 || response.status === 204) { // Si le statut de la réponse est 200 ou 204 (réponse réussie sans contenu)
-            console.log("La suppression a réussi")
-            // Supprimer le travail
-            figureToDelete.forEach(function (figure) {
-                figure.remove();
-            });
-        } else {
-            console.log(token)
-            console.log(`Statut de réponse : ${response.status}`);
-        }
-    });
-})
+async function removeWork() {
+    document.querySelectorAll(".js-link__work--delete").forEach((a) => { // Pour chaque liens...
+        a.addEventListener("click", async (event) => { // ... Ajouter un EventListener qui écoute le clic
+            event.preventDefault();
+            // Trouver le lien qui a été cliqué en utilisant l'ID
+            const clickedLinkId = event.currentTarget.id;
+            console.log(`Le lien avec l'ID ${clickedLinkId} a été cliqué.`);
+            const url = `http://localhost:5678/api/works/${clickedLinkId}`;
+            console.log(url);
+            const figureToDelete = document.querySelectorAll(`[data-id="${clickedLinkId}"]`); // Récupérer la figure qui correspond au même ID que le lien
+            const response = await fetch(url, {
+                method: `DELETE`,
+                headers: {
+                    Authorization: `Bearer ${token}`, // En-tête d'authentification
+                },
+            })
+            if (response.status === 200 || response.status === 204) { // Si le statut de la réponse est 200 ou 204 (réponse réussie sans contenu)
+                console.log("La suppression a réussi")
+                // Supprimer le travail
+                figureToDelete.forEach(function (figure) {
+                    figure.remove();
+                });
+            } else {
+                console.log(token)
+                console.log(`Statut de réponse : ${response.status}`);
+            }
+        });
+    })
+}
+
+removeWork()
 
 
 /*************************************** Partie filtres *****************************************/
@@ -373,7 +360,7 @@ function filters(btnFilter, Id) {
         const worksFiltered = works.filter(function (work) { // Appel de la fonction filtrage sur chaque élément du tableau works
             return work.categoryId === Id; // Retourner les élémennts ayant la même catégorieId que Id
         });
-        document.querySelector(".gallery").innerHTML = ""; // Efface tout le HTML de la classe .gallery
+        divGallery.innerHTML = ""; // Efface tout le HTML de la classe .gallery
         unselectAllbuttons() // Appel de la fonction enlevant la classe .selected à tous les boutons de la classe .filters
         btnFilter.classList.add("selected") // Attribution de la classe .selected au bouton btnFilter
         generateWorks(worksFiltered); // Générer la page avec le filtre appliqué
@@ -384,7 +371,7 @@ function filters(btnFilter, Id) {
 const btnFilterAll = document.querySelector(".btnFilterAll");
 btnFilterAll.addEventListener("click", function () {
     if (!isAllDisplayed) { // Si isAllDisplayed === false
-        document.querySelector(".gallery").innerHTML = "";
+        divGallery.innerHTML = "";
         generateWorks(works); // Affiche toutes les œuvres non filtrées
         unselectAllbuttons();
         btnFilterAll.classList.add("selected");
