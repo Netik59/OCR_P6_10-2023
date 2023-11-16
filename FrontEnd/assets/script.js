@@ -210,11 +210,36 @@ function generateModalWorks(works) {
 
 generateModalWorks(works);
 
+function parseJwt(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+function isTokenValid(token) {
+    const decodedJWT = parseJwt(token);
+    console.log(decodedJWT)
+    const expirationDate = new Date(decodedJWT.exp * 1000)
+    console.log(expirationDate)
+    const today = new Date()
+    return today < expirationDate
+}
 
 /*************************** Connexion et affichage du mode admin *******************************/
 let a__log = document.getElementById("a__log");
 // Si le token du local storage existe
 if (token) {
+    if (!isTokenValid(token)) {
+        console.log(token)
+        // Si le lien n'a pas d'attribut href, cela veut dire qu'il est en mode logout, donc au clic, se déconnecter
+        localStorage.removeItem('token');
+        location.reload();
+
+    }
     // Passer en mode admin
     document.querySelector(".edit_mode").classList.add("display__flex"); // Permet d'afficher la barre noire au dessus
     document.querySelector(".edit__link--modale").classList.add("display__inline"); // Permet d'afficher le bouton modifier à côté de "Mes Projets"
@@ -263,7 +288,11 @@ jsModalBack.addEventListener("click", function (e) {
     articleEditWorks.style.display = 'flex';
 });
 
-
+async function getWorks() {
+    const response = await fetch("http://localhost:5678/api/works");
+    const worksData = await response.json();
+    return worksData
+}
 
 
 /******************************** Ajout d'un projet *******************************/
@@ -273,6 +302,7 @@ btn__ValidatePhoto.addEventListener("click", async function (e) {
     } else {
         e.preventDefault();
         const url = `http://localhost:5678/api/works`;
+
 
         const formData = new FormData(); // Créer un objet FormData
 
@@ -292,8 +322,7 @@ btn__ValidatePhoto.addEventListener("click", async function (e) {
 
             divGallery.innerHTML = "";
             articleEditWorks.innerHTML = "";
-            const response = await fetch("http://localhost:5678/api/works");
-            const worksData = await response.json();
+            const worksData = await getWorks();
             generateWorks(worksData);
             generateModalWorks(worksData);
 
@@ -356,8 +385,9 @@ function unselectAllbuttons() {
 let isAllDisplayed = false; // Variable pour suivre l'état actuel du bouton "Tout afficher"
 // Fonction pour générer les filtres
 function filters(btnFilter, Id) {
-    btnFilter.addEventListener("click", function () {
-        const worksFiltered = works.filter(function (work) { // Appel de la fonction filtrage sur chaque élément du tableau works
+    btnFilter.addEventListener("click", async function () {
+        const worksData = await getWorks();
+        const worksFiltered = worksData.filter(function (work) { // Appel de la fonction filtrage sur chaque élément du tableau works
             return work.categoryId === Id; // Retourner les élémennts ayant la même catégorieId que Id
         });
         divGallery.innerHTML = ""; // Efface tout le HTML de la classe .gallery
@@ -365,19 +395,23 @@ function filters(btnFilter, Id) {
         btnFilter.classList.add("selected") // Attribution de la classe .selected au bouton btnFilter
         generateWorks(worksFiltered); // Générer la page avec le filtre appliqué
         isAllDisplayed = false; // Variable pour suivre l'état actuel du bouton "Tout afficher"
+
     });
 }
 // Code pour le bouton "Tous" affichant tous les travaux
 const btnFilterAll = document.querySelector(".btnFilterAll");
-btnFilterAll.addEventListener("click", function () {
+btnFilterAll.addEventListener("click", async function () {
     if (!isAllDisplayed) { // Si isAllDisplayed === false
+        const worksData = await getWorks();
         divGallery.innerHTML = "";
-        generateWorks(works); // Affiche toutes les œuvres non filtrées
+        generateWorks(worksData); // Affiche toutes les œuvres non filtrées
         unselectAllbuttons();
         btnFilterAll.classList.add("selected");
         isAllDisplayed = true; // Met à jour l'état du bouton "Tout afficher"
+
     }
 });
+
 // Appel des fonctions de filtrages
 const btnFilterObjects = document.querySelector(".btnFilterObjects");
 filters(btnFilterObjects, 1);
